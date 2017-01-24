@@ -22,6 +22,8 @@ with open('quora_duplicate_questions.tsv', 'rbU') as csvfile:
     for i, row in enumerate(reader):
         if i < 1:
             continue
+        if len(row[3]) < 1 or len(row[4]) < 1:
+            continue
 
         example = {}
         example['sentence1'] = row[3]
