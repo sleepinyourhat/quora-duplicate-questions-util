@@ -5,6 +5,7 @@ import nltk
 # Converter by Sam Bowman (bowman@nyu.edu)
 
 # Converts quora_duplicate_questions.csv, as distributed, to SNLI's formats.
+# Data can be found here: https://data.quora.com/First-Quora-Dataset-Release-Question-Pairs
 # Note: No parsing yet, just crude tokenization.
 
 # Instructions: Install nltk, move into the same directory as the source file, run.
