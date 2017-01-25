@@ -11,7 +11,7 @@ import nltk.tokenize
 # Instructions: Install nltk and unicodecsv, move into the same directory as the source file, run.
 
 
-LABELS = ['entailment', 'neutral']
+LABELS = ['neutral', 'entailment']
 
 dev_set = []
 test_set = []
