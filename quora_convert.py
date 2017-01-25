@@ -1,6 +1,6 @@
-import csv
+import unicodecsv
 import json
-import nltk
+import nltk.tokenize
 
 # Converter by Sam Bowman (bowman@nyu.edu)
 
@@ -8,7 +8,7 @@ import nltk
 # Data can be found here: https://data.quora.com/First-Quora-Dataset-Release-Question-Pairs
 # Note: No parsing yet, just crude tokenization.
 
-# Instructions: Install nltk, move into the same directory as the source file, run.
+# Instructions: Install nltk and unicodecsv, move into the same directory as the source file, run.
 
 
 LABELS = ['entailment', 'neutral']
@@ -17,8 +17,10 @@ dev_set = []
 test_set = []
 training_set = []
 
+tt = nltk.tokenize.treebank.TreebankWordTokenizer()
+
 with open('quora_duplicate_questions.tsv', 'rbU') as csvfile:
-    reader = csv.reader(csvfile, delimiter="\t")
+    reader = unicodecsv.reader(csvfile, delimiter="\t")
     for i, row in enumerate(reader):
         if i < 1:
             continue
@@ -31,8 +33,8 @@ with open('quora_duplicate_questions.tsv', 'rbU') as csvfile:
         example['gold_label'] = LABELS[int(row[5])]
         example['pairID'] = row[0]
 
-        example['sentence1_parse'] = example['sentence1_binary_parse'] = ' '.join(nltk.word_tokenize(example['sentence1']))
-        example['sentence2_parse'] = example['sentence2_binary_parse'] = ' '.join(nltk.word_tokenize(example['sentence2']))
+        example['sentence1_parse'] = example['sentence1_binary_parse'] = ' '.join(tt.tokenize(example['sentence1']))
+        example['sentence2_parse'] = example['sentence2_binary_parse'] = ' '.join(tt.tokenize(example['sentence2']))
 
         if i <= 10000:
             dev_set.append(example)
@@ -44,8 +46,8 @@ with open('quora_duplicate_questions.tsv', 'rbU') as csvfile:
 def write_json(data, filename):
     with open(filename, 'w') as outfile:
         for item in data:
-            json.dump(item, outfile, sort_keys=True)
-            outfile.write('\n')
+            s = json.dumps(item, sort_keys=True, ensure_ascii=False).encode('UTF-8')
+            outfile.write(s + '\n')
 
 def write_txt(data, filename):
     with open(filename, 'w') as outfile:
@@ -59,7 +61,7 @@ def write_txt(data, filename):
                 '\t\t' + item['pairID']
             for i in range(5):
                 tab_sep_string += '\t'
-            outfile.write(tab_sep_string + '\n')
+            outfile.write(tab_sep_string.encode('UTF-8') + '\n')
         outfile.close()
 
 write_json(training_set, 'quora_duplicate_questions_train.jsonl')
