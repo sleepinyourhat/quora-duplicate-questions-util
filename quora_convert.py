@@ -10,7 +10,9 @@ import nltk.tokenize
 
 # Instructions: Install nltk and unicodecsv, move into the same directory as the source file, run.
 
+# If you want parses, run the accompanying Java tool first, then run this tool with USE_STANFORD_PARSER_OUTPUT set below.
 
+USE_STANFORD_PARSER_OUTPUT = False
 LABELS = ['neutral', 'entailment']
 
 dev_set = []
@@ -19,22 +21,40 @@ training_set = []
 
 tt = nltk.tokenize.treebank.TreebankWordTokenizer()
 
-with open('quora_duplicate_questions.tsv', 'rbU') as csvfile:
+if USE_STANFORD_PARSER_OUTPUT:
+    ext = "_parsed.tsv"
+else:
+    ext = ".tsv"
+
+with open('quora_duplicate_questions' + ext, 'rbU') as csvfile:
     reader = unicodecsv.reader(csvfile, delimiter="\t")
     for i, row in enumerate(reader):
         if i < 1:
             continue
-        if len(row[3]) < 1 or len(row[4]) < 1:
+        if len(row) == 0:
             continue
 
         example = {}
-        example['sentence1'] = row[3]
-        example['sentence2'] = row[4]
-        example['gold_label'] = LABELS[int(row[5])]
         example['pairID'] = row[0]
 
-        example['sentence1_parse'] = example['sentence1_binary_parse'] = ' '.join(tt.tokenize(example['sentence1']))
-        example['sentence2_parse'] = example['sentence2_binary_parse'] = ' '.join(tt.tokenize(example['sentence2']))
+        if USE_STANFORD_PARSER_OUTPUT:
+            if len(row[3]) < 1 or len(row[5]) < 1:
+                continue
+            example['sentence1'] = row[3]
+            example['sentence1_parse'] = example['sentence1_binary_parse'] = row[4]
+            example['sentence2'] = row[5]
+            example['sentence2_parse'] = example['sentence2_binary_parse'] = row[6]
+            example['gold_label'] = LABELS[int(row[7])]
+        else:
+            if len(row[3]) < 1 or len(row[4]) < 1:
+                continue
+            example['sentence1'] = row[3]
+            example['sentence2'] = row[4]
+            example['gold_label'] = LABELS[int(row[5])]
+            example['pairID'] = row[0]
+
+            example['sentence1_parse'] = example['sentence1_binary_parse'] = ' '.join(tt.tokenize(example['sentence1']))
+            example['sentence2_parse'] = example['sentence2_binary_parse'] = ' '.join(tt.tokenize(example['sentence2']))
 
         if i <= 10000:
             dev_set.append(example)
